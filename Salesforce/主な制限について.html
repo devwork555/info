@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name=viewport content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Salesforce情報">
+	<style type="text/css">
+		strong{
+			color: #ff0000;
+			font-weight: bold;
+		}
+		table,th,td{
+			border:solid 1px;
+			border-collapse:collapse;
+			padding: 3px;
+		}
+		th{
+			white-space: nowrap;
+		}
+		.sSeparator{
+			margin-top: 10px;
+		}
+		.mSeparator{
+			margin-top: 20px;
+		}
+		.bSeparator{
+			margin-top: 50px;
+		}
+		.tCenter{
+			text-align: center;
+		}
+		.tRight{
+			text-align: right;
+		}
+	</style>
+	<title>Salesforce情報</title>
+</head>
+<body>
+<h1>(1)制限</h1>
+	<h2 id="sct01">■Sandboxの制限</h2>
+	<div>
+		<a href="#sct01">Top</a>
+		<a href="#sct01">Before</a>
+		<a href="#sct02">Next</a>
+		<a href="#last">Last</a>
+	</div>
+
+	<table class="mSeparator">
+	<caption>Sandboxの種類と制限</caption>
+	<tr>
+		<th>No</th>
+		<th>名称</th>
+		<th>設定コピー</th>
+		<th>データコピー</th>
+		<th>ディスク容量</th>
+		<th>更新可能間隔</th>
+	</tr>
+	<tr>
+		<td class="tCenter">1</td>
+		<td>Developer</td>
+		<td class="tCenter">○</td>
+		<td class="tCenter">×</td>
+		<td class="tCenter">200Mbyte</td>
+		<td class="tCenter">1日後</td>
+	</tr>
+	<tr>
+		<td class="tCenter">2</td>
+		<td>Developer Pro</td>
+		<td class="tCenter">○</td>
+		<td class="tCenter">×</td>
+		<td class="tCenter">1Gbyte</td>
+		<td class="tCenter">1日後</td>
+	</tr>
+	<tr>
+		<td class="tCenter">3</td>
+		<td>Partial Copy</td>
+		<td class="tCenter">○</td>
+		<td class="tCenter">○</td>
+		<td class="tCenter">5Gbyte</td>
+		<td class="tCenter">5日後</td>
+	</tr>
+	<tr>
+		<td class="tCenter">4</td>
+		<td>Full</td>
+		<td class="tCenter">○</td>
+		<td class="tCenter">○</td>
+		<td class="tCenter">本番組織と同様</td>
+		<td class="tCenter">29日後</td>
+	</tr>
+	</table>
+	<ul>
+		<li>
+			Partial Copyのデータコピーは、Sandboxテンプレートで定義されている
+			本番データのサブセットのみ。
+		</li>
+		<li>
+			Fullのデータコピーは、デフォルトでは項目履歴は省略されるが、
+			180 日までの項目履歴を含めることができる。
+			本番組織で多くのオブジェクトの項目履歴を追跡している場合は、
+			過剰な量のデータが生成されないように少ない日数を指定する。
+			Chatterデータのコピー有無も選択可能。コピーする場合は、Sandboxの
+			作成時間が大幅に増える可能性がある。
+		</li>
+	</ul>
+
+	<h2 id="sct02">■Apexの制限</h2>
+	<div>
+		<a href="#sct01">Top</a>
+		<a href="#sct01">Before</a>
+		<a href="#sct03">Next</a>
+		<a href="#last">Last</a>
+	</div>
+
+		<h3>①トランザクション単位の制限</h3>
+		<p>
+			下記制限はトランザクション単位にカウントされる。
+			Batch Apexの場合、これらの制限は
+			<strong>executeメソッド実行ごとにリセット</strong>
+			される。
+		</p>
+		<table>
+		<tr>
+			<th>No</th>
+			<th>制限内容</th>
+			<th>同期Apex</th>
+			<th>非同期Apex</th>
+		</tr>
+		<tr>
+			<td class="tCenter">1</td>
+			<td>発行される数SOQL<sup>注1</sup></td>
+			<td class="tCenter">100</td>
+			<td class="tCenter">200</td>
+		</tr>
+		<tr>
+			<td class="tCenter">2</td>
+			<td>SOQLによって取得できるレコード数</td>
+			<td colspan="2" class="tCenter">50,000</td>
+		</tr>
+		<tr>
+			<td class="tCenter">3</td>
+			<td>Database.getQueryLocatorによって取得できるレコード数</td>
+			<td colspan="2" class="tCenter">10,000</td>
+		</tr>
+		<tr>
+			<td class="tCenter">4</td>
+			<td>発行されるSOSL数</td>
+			<td colspan="2" class="tCenter">20</td>
+		</tr>
+		<tr>
+			<td class="tCenter">5</td>
+			<td>SOSLによって取得できるレコード数</td>
+			<td colspan="2" class="tCenter">2,000</td>
+		</tr>
+		<tr>
+			<td class="tCenter">6</td>
+			<td>発行されるDML数<sup>注2</sup></td>
+			<td colspan="2" class="tCenter">150</td>
+		</tr>
+		<tr>
+			<td class="tCenter">7</td>
+			<td>DMLによって処理される数レコード数<sup>注2</sup></td>
+			<td colspan="2" class="tCenter">10,000</td>
+		</tr>
+		<tr>
+			<td class="tCenter">8</td>
+			<td>
+				DMLによって繰り返しトリガーする
+				Apex呼び出しのスタックの深さ
+			</td>
+			<td colspan="2" class="tCenter">16</td>
+		</tr>
+		<tr>
+			<td class="tCenter">9</td>
+			<td>コールアウト(HTTP要求、またはWebサービスコール)数</td>
+			<td colspan="2" class="tCenter">10</td>
+		</tr>
+		<tr>
+			<td class="tCenter">10</td>
+			<td>
+				すべてのコールアウト(HTTP要求、またはWebサービスコール)
+				のタイムアウト時間
+			</td>
+			<td colspan="2" class="tCenter">120秒</td>
+		</tr>
+		<tr>
+			<td class="tCenter">11</td>
+			<td>Apex呼び出し1回のfutureメソッドの数</td>
+			<td colspan="2" class="tCenter">10</td>
+		</tr>
+		<tr>
+			<td class="tCenter">12</td>
+			<td>sendEmailメソッドの数</td>
+			<td colspan="2" class="tCenter">10</td>
+		</tr>
+		<tr>
+			<td class="tCenter">13</td>
+			<td>ヒープの合計サイズ</td>
+			<td class="tCenter">6MB</td>
+			<td class="tCenter">12MB</td>
+		</tr>
+		<tr>
+			<td class="tCenter">14</td>
+			<td>SalesforceサーバのCUP時間<sup>注3</sup></td>
+			<td class="tCenter">10,000ミリ秒</td>
+			<td class="tCenter">60,000ミリ秒</td>
+		</tr>
+		<tr>
+			<td class="tCenter">15</td>
+			<td>最大実行時間</td>
+			<td colspan="2" class="tCenter">10分</td>
+		</tr>
+		</table>
+		<ul>
+			<li>注1
+				<p>
+					親子リレーションのサブクエリを使用するSOQLの場合、
+					各親子リレーションは追加クエリとしてカウントされ、
+					行数も全体のコード実行行数に加算される。
+				</p>
+			</li>
+			<li>注2
+				<p>下記メソッドへのコールはDMLクエリ数としてカウントされる。</p>
+				<ol>
+					<li>Approval.process</li>
+					<li>Database.convertLead(リードの取引開始)</li>
+					<li>Database.emptyRecycleBin(ゴミ箱から完全に削除)</li>
+					<li>Database.rollback</li>
+					<li>Database.setSavePoint</li>
+					<li>deleteとDatabase.delete</li>
+					<li>insertとDatabase.insert</li>
+					<li>updateとDatabase.update</li>
+					<li>upsertとDatabase.upsert</li>
+					<li>margeとDatabase.marge</li>
+					<li>undeleteとDatabase.undelete</li>
+					<li>System.runAs</li>
+				</ol>
+			</li>
+			<li style="margin-top:10px;">注3
+				<p>
+					CPU時間を消費しない操作(DML、SOQL、SOSLによる
+					データベースに費やされた時間や、Apexコールアウトの
+					待ち時間など)は、CPU時間に加算されない。
+				</p>
+			</li>
+		</ul>
+
+		<h3>②Force.comプラットフォーム単位の制限</h3>
+		<table>
+		<tr>
+			<th>No</th>
+			<th>制限内容</th>
+			<th>制限</th>
+		</tr>
+		<tr>
+			<td class="tCenter">1</td>
+			<td>24時間あたりの非同期Apexの実行数</td>
+			<td>250,000か、組織内のユーザライセンス数×200の大きい方</td>
+		</tr>
+		<tr>
+			<td class="tCenter">2</td>
+			<td>同じホストのURLへのコールアウト最大同時要求数</td>
+			<td>20</td>
+		</tr>
+		<tr>
+			<td class="tCenter">3</td>
+			<td>同時にスケジュールされるApexクラスの最大数</td>
+			<td>100</td>
+		</tr>
+		<tr>
+			<td class="tCenter">4</td>
+			<td>キューに入っている有効なApexBatchの最大数</td>
+			<td>5</td>
+		</tr>
+		<tr>
+			<td class="tCenter">5</td>
+			<td>ユーザごとのクエリカーソルの最大数</td>
+			<td>50(一度に開けるのは10)</td>
+		</tr>
+		</table>
+
+		<h3>③静的Apex単位の制限</h3>
+		<table>
+		<tr>
+			<th>No</th>
+			<th>制限内容</th>
+			<th>制限</th>
+		</tr>
+		<tr>
+			<td class="tCenter">1</td>
+			<td>
+				コールアウト(HTTP要求、またはWebサービスコール)
+				のタイムアウト時間
+			</td>
+			<td>10秒</td>
+		</tr>
+		<tr>
+			<td class="tCenter">2</td>
+			<td>
+				コールアウト(HTTP要求、またはWebサービスコール)、
+				コールアウトのレスポンスのサイズ
+			</td>
+			<td>3MB</td>
+		</tr>
+		<tr>
+			<td class="tCenter">3</td>
+			<td>SOQLの実行時間</td>
+			<td>120秒</td>
+		</tr>
+		<tr>
+			<td class="tCenter">4</td>
+			<td>
+				Database.QueryLocatorの1回のApexBatchで返される
+				レコード数
+			</td>
+			<td>5,000万</td>
+		</tr>
+		</table>
+
+	<h2 id="sct03">■メールの制限</h2>
+	<div>
+		<a href="#sct01">Top</a>
+		<a href="#sct02">Before</a>
+		<a href="#sct04">Next</a>
+		<a href="#last">Last</a>
+	</div>
+
+	<table class="mSeparator">
+	<tr>
+		<th>No</th>
+		<th>制限内容</th>
+		<th>制限</th>
+	</tr>
+	<tr>
+		<td class="tCenter">1</td>
+		<td>1日あたり送信できる外部アドレス(単一メール)</td>
+		<td>1,000</td>
+	</tr>
+	<tr>
+		<td class="tCenter">1</td>
+		<td>1日あたり送信できる外部アドレス(一括メール)</td>
+		<td>1,000</td>
+	</tr>
+	</table>
+	<ul>
+		<li>SingleEmailMessageごとに100個までのメールを送信できる。</li>
+		<li>
+			一括メールごとの最大外部アドレス数はエディションによって決まっている。
+			Enterpriseの場合は500、UnlimitedおよびPerformanceの場合は1,000。
+		</li>
+		<li>
+			単一メール、一括メール共に外部アドレスが同じでも
+			外部アドレス数にカウントされる。
+		</li>
+	</ul>
+
+	<h2 id="sct04">■SOQLとSOSLの制限</h2>
+	<div>
+		<a href="#sct01">Top</a>
+		<a href="#sct03">Before</a>
+		<a href="#sct05">Next</a>
+		<a href="#last">Last</a>
+	</div>
+
+	<table class="mSeparator">
+	<tr>
+		<th>No</th>
+		<th>制限内容</th>
+		<th>制限</th>
+	</tr>
+	<tr>
+		<td class="tCenter">1</td>
+		<td>SOQLのORDER BY項目数</td>
+		<td>32</td>
+	</tr>
+	<tr>
+		<td class="tCenter">2</td>
+		<td>リレーションクエリの制限</td>
+		<td>子⇒親リレーションは35個以下、親⇒子は20個以下</td>
+	</tr>
+	<tr>
+		<td class="tCenter">3</td>
+		<td>SOQL文字数(コンパイル後の文字数)</td>
+		<td>20,000文字</td>
+	</tr>
+	<tr>
+		<td class="tCenter">4</td>
+		<td>SOQLのOFFSET句でスキップされる行数</td>
+		<td>2,000</td>
+	</tr>
+	</table>
+
+	<h2 id="sct05">■Visualforceの制限</h2>
+	<div>
+		<a href="#sct01">Top</a>
+		<a href="#sct04">Before</a>
+		<a href="#sct06">Next</a>
+		<a href="#last">Last</a>
+	</div>
+
+	<table class="mSeparator">
+	<tr>
+		<th>No</th>
+		<th>制限内容</th>
+		<th>制限</th>
+	</tr>
+	<tr>
+		<td class="tCenter">1</td>
+		<td>応答サイズ</td>
+		<td>15MB未満</td>
+	</tr>
+	<tr>
+		<td class="tCenter">2</td>
+		<td>ビューステート</td>
+		<td>135KB</td>
+	</tr>
+	<tr>
+		<td class="tCenter">3</td>
+		<td>Visualforceメールテンプレートサイズ</td>
+		<td>1MB</td>
+	</tr>
+	<tr>
+		<td class="tCenter">4</td>
+		<td>Visualforceでのファイルアップロードのファイルサイズ</td>
+		<td>10MB</td>
+	</tr>
+	<tr>
+		<td class="tCenter">5</td>
+		<td>PDFとして表示する際の、PDF表示前のHTML応答サイズ</td>
+		<td>15MB未満</td>
+	</tr>
+	<tr>
+		<td class="tCenter">6</td>
+		<td>PDFとして表示する際のPDFファイルサイズ</td>
+		<td>60MB</td>
+	</tr>
+	<tr>
+		<td class="tCenter">7</td>
+		<td>PDFとして表示する際の全画像のサイズ</td>
+		<td>30MB</td>
+	</tr>
+	<tr>
+		<td class="tCenter">8</td>
+		<td>JavaScriptリモートコールの応答サイズ</td>
+		<td>15MB</td>
+	</tr>
+	<tr>
+		<td class="tCenter">9</td>
+		<td>JavaScriptリモートコールのタイムアウト</td>
+		<td>120秒</td>
+	</tr>
+	<tr>
+		<td class="tCenter">10</td>
+		<td>取得されるレコード数</td>
+		<td>50,000</td>
+	</tr>
+	<tr>
+		<td class="tCenter">11</td>
+		<td>readonlyで取得されるレコード数</td>
+		<td>100万</td>
+	</tr>
+	<tr>
+		<td class="tCenter">12</td>
+		<td>反復可能なコレクション数</td>
+		<td>1,000</td>
+	</tr>
+	<tr>
+		<td class="tCenter">13</td>
+		<td>readonlyで反復可能なコレクション数</td>
+		<td>10,000</td>
+	</tr>
+	<tr>
+		<td class="tCenter">14</td>
+		<td>表示可能な項目セット数</td>
+		<td>50</td>
+	</tr>
+	<tr>
+		<td class="tCenter">15</td>
+		<td>StandardControllerで処理可能なレコード数</td>
+		<td>10,000</td>
+	</tr>
+	</table>
+
+<h1>(2)Apex</h1>
+	<h2 id="sct06">■Apexの基本概念</h2>
+	<div>
+		<a href="#sct01">Top</a>
+		<a href="#sct05">Before</a>
+		<a href="#sct07">Next</a>
+		<a href="#last">Last</a>
+	</div>
+
+		<h3>①パラメータについて</h3>
+		<p>
+			Integer、Stringなどのプリミティブ型、
+			およびsObjectなど非プリミティブ型も値で渡される。
+			そのため、非プリミティブ型のパラメータの参照先を
+			<strong>呼び出されるメソッド側で変更することはできない。</strong>
+			ただし、オブジェクトの内容は変更可能(Listの要素を追加、変更するなど)。
+		</p>
+
+		<h3>②比較演算子について</h3>
+		<ul>
+			<li>String型の場合
+				<p>
+					==演算子で比較した場合、
+					<strong>大文字小文字を区別しない。</strong>
+					equalsメソッド、containsメソッドでは区別される。
+				</p>
+				<p>
+					例)<br>
+					String a = 'ABC';<br>
+					String b = 'abc';
+				</p>
+				<table>
+				<tr>
+					<th>比較方法</th>
+					<th>結果</th>
+				</tr>
+				<tr>
+					<td>a == b</td>
+					<td class="tCenter">true</td>
+				</tr>
+				<tr>
+					<td>a.equals(b)</td>
+					<td class="tCenter">false</td>
+				</tr>
+				<tr>
+					<td>a.contains(b)</td>
+					<td class="tCenter">false</td>
+				</tr>
+				</table>
+			</li>
+			<li>Mapのキーの場合
+				<p>Mapのキーの場合、<strong>大文字小文字は区別される。</strong></p>
+				<p>
+					Map&lt;String, String&gt; wmap = new Map&lt;String, String&gt;();<br>
+					wmap.put('ABC', '1');<br>
+					wmap.put('abc', '2');<br>
+					wmap.keySet().size()　⇒　別キーとして登録されるので2になる
+				</p>
+			</li>
+			<li>sObject型の場合
+				<p>
+					==は<strong>参照先のオブジェクトが同じかどうか</strong>で比較される。
+					===は<strong>参照アドレスが同じかどうか</strong>で比較される。
+				</p>
+				<p>
+					例)同じAccountを参照するsObject型変数の比較<br>
+					Account a = [SELECT Id FROM Account WHERE Id = '123'];<br>
+					Account b = [SELECT Id FROM Account WHERE Id = '123'];<br>
+					Account c = a;<br>
+				</p>
+				<table>
+				<tr>
+					<th>比較方法</th>
+					<th>結果</th>
+				</tr>
+				<tr>
+					<td>a == b</td>
+					<td class="tCenter">true</td>
+				</tr>
+				<tr>
+					<td>a === b</td>
+					<td class="tCenter">false</td>
+				</tr>
+				<tr>
+					<td>a == c</td>
+					<td class="tCenter">true</td>
+				</tr>
+				<tr>
+					<td>a === c</td>
+					<td class="tCenter">true</td>
+				</tr>
+				</table>
+			</li>
+			<li class="mSeparator">ユーザ定義型の場合
+				<p>
+					==、===ともに<strong>参照先アドレスが同じかどうか</strong>
+					で比較される。
+				</p>
+				<p>
+					例)<br>
+					public class Cls{public Cls(){}}<br>
+					Cls a = new Cls();<br>
+					Cls b = new Cls();<br>
+					Cls c = a;<br>
+				</p>
+				<table>
+				<tr>
+					<th>比較方法</th>
+					<th>結果</th>
+				</tr>
+				<tr>
+					<td>a == b</td>
+					<td class="tCenter">false</td>
+				</tr>
+				<tr>
+					<td>a === b</td>
+					<td class="tCenter">false</td>
+				</tr>
+				<tr>
+					<td>a == c</td>
+					<td class="tCenter">true</td>
+				</tr>
+				<tr>
+					<td>a === c</td>
+					<td class="tCenter">true</td>
+				</tr>
+				</table>
+			</li>
+		</ul>
+		<p>
+			以下の演算子を使用した場合、
+			<strong>結果がnullになることはない</strong>(どちらかがnullの場合でも)。
+		</p>
+		<table>
+		<tr>
+			<th>No</th>
+			<th>演算子</th>
+			<th>概要</th>
+		</tr>
+		<tr>
+			<td class="tCenter">1</td>
+			<td class="tCenter">==</td>
+			<td>等価演算子</td>
+		</tr>
+		<tr>
+			<td class="tCenter">2</td>
+			<td class="tCenter">===</td>
+			<td>厳密な等価演算子</td>
+		</tr>
+		<tr>
+			<td class="tCenter">3</td>
+			<td class="tCenter">&lt;</td>
+			<td>比較演算子(小なり)</td>
+		</tr>
+		<tr>
+			<td class="tCenter">4</td>
+			<td class="tCenter">=&lt;</td>
+			<td>比較演算子(以下)</td>
+		</tr>
+		<tr>
+			<td class="tCenter">5</td>
+			<td class="tCenter">&gt;</td>
+			<td>比較演算子(大なり)</td>
+		</tr>
+		<tr>
+			<td class="tCenter">6</td>
+			<td class="tCenter">&gt;=</td>
+			<td>比較演算子(以上)</td>
+		</tr>
+		<tr>
+			<td class="tCenter">7</td>
+			<td class="tCenter">!=</td>
+			<td>不等価演算子</td>
+		</tr>
+		<tr>
+			<td class="tCenter">8</td>
+			<td class="tCenter">!==</td>
+			<td>厳密な不等価演算子</td>
+		</tr>
+		</table>
+		<p>
+			Integer、またはLong型の除算時に端数が発生する場合、
+			DoubleやDecimalに<strong>変換される前に除外</strong>されてしまう。
+		</p>
+		<p>
+			例)<br>
+			Integer a = 5;<br>
+			Integer b = 3;<br>
+			Double d = a / b;　⇒　dは1.0になる<br>
+			Double g = (Double)a / (Double)b;　⇒　dは1.6666666666666667になる
+		</p>
+
+		<h3>③変数の初期化について</h3>
+		<p>
+			明示的に初期化しない場合、プリミティブ型、非プリミティブ型ともに
+			<strong>nullで初期化</strong>される。
+			<strong>Boolean型もnull(falseではない)で初期化</strong>
+			されるので注意！
+		</p>
+
+<div id="last" class="mSeparator">
+	<a href="#sct01">Top</a>
+	<a href="#sct17">Before</a>
+	<a href="#last">Next</a>
+	<a href="#last">last</a>
+</div>
+</body>
+</html>
