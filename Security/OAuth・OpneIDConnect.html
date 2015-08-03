@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name=viewport content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="OAuth・OpneIDConnect">
+	<style type="text/css">
+		strong{
+			color: #ff0000;
+			font-weight: bold;
+		}
+		table,th,td{
+			border:solid 1px;
+			border-collapse:collapse;
+			padding: 3px;
+		}
+		th{
+			white-space: nowrap;
+		}
+		.sSeparator{
+			margin-top: 10px;
+		}
+		.mSeparator{
+			margin-top: 20px;
+		}
+		.bSeparator{
+			margin-top: 50px;
+		}
+		.txtCenter{
+			text-align: center;
+		}
+		.txtRight{
+			text-align: right;
+		}
+		.nowrap{
+			white-space: nowrap;
+		}
+		.tl{
+			font-wieght: bold;
+			font-size: 1.5em;
+		}
+	</style>
+	<title>OAuth・OpneIDConnect</title>
+</head>
+<body>
+<h1 id="sct01">(1)OAuthの基本動作</h1>
+<div>
+	<a href="#sct01">Top</a>
+	<a href="#sct01">Before</a>
+	<a href="#sct02">Next</a>
+	<a href="#last">Last</a>
+</div>
+<p class="tl">■OAuthとは</p>
+<p>
+	あるサービス(サービスA)上にユーザが所有するリソースや、
+	ユーザがアクセス権限を持つサービスAの各機能に対し、
+	ユーザの許可を受けた別のサービス(サービスB)がアクセスするために、
+</p>
+<p>
+	ユーザがサービスBに<strong>許可を与え</strong>、
+	サービスBがサービスAの提供するAPIにアクセスする際に
+	<strong>許可を受けていることを証明する</strong>
+</p>
+<p>
+	という一連のフローをセキュアに実現することを目的とした
+	<strong>「アクセス権限の付与」</strong>のためのプロトコル。
+</p>
+
+<hr>
+<p class="tl">■OAuthの登場人物</p>
+<figure>
+	<figcaption>OAuthの登場人物</figcaption>
+	<img src="./static/worker.jpg" alt="OAuthの登場人物">
+</figure>
+<ul>
+	<li>OAuth Server
+		<p>OAuthをサポートしたAPIを提供しているサービス</p>
+	</li>
+	<li>OAuth Client
+		<p>OAuth Serverが提供するAPIを利用する側のサービス</p>
+	</li>
+	<li>Resource Owner
+		<p>アクセス権限の付与を行うユーザ</p>
+	</li>
+</ul>
+<p>
+	OAuth1.0が出てきたころはOAuth Serverを「OAuth Service Provider」、
+	OAuth Clientを「OAuth Consumer」と呼んでいた。
+</p>
+
+<hr>
+<p class="tl">■OAuthの基本的な流れ</p>
+<figure>
+	<figcaption>【OAuthの基本的な流れ】</figcaption>
+	<img src="./static/flow.jpg" alt="OAuthの基本的な流れ">
+</figure>
+<ol>
+	<li>Client Registration(クライアント登録)
+		<p>
+			OAuth Clientは、ユーザとのインタラクションを行う前に、
+			OAuth Serverに対してアプリ名やドメインなどを添えて自身を登録する。
+			<strong>Clientの登録方法はOAuthの仕様では含まれていないが、</strong>
+			通常はAPI提供者のデベロッパー向けサイトなどでClientを登録することになる。
+			このステップは次回以降は不要。
+		</p>
+	</li>
+	<li>Initiate(フロー開始)
+		<p>
+			OAuth ClientがResource Ownerから<strong>APIアクセス権限の付与</strong>
+			を受ける必要がある。
+			OAuth1.0とOAuth2.0では多少このフローは異なるが、
+			基本的にはOAuth Client上に「Facebook IDでログイン」などのボタンがあり、
+			ユーザがそれをクリックすることでフローが開始する。
+		</p>
+	</li>
+	<li>Authorization Request(認可のリクエスト)
+		<p>
+			フローが開始されると、OAuth Clientは
+			<strong>OAuth Serverにリダイレクトさせる。</strong>
+			この際、OAuth ServerがどのOAuth Clientからリダイレクトを
+			受けたか判断できるように、<strong>OAuth Clientの識別情報を付与</strong>する。
+			OAuth2.0では<strong>「client_id」</strong>というパラメータが識別情報となる。
+		</p>
+	</li>
+	<li>Authentication & Approval(ユーザ認証とアクセス権限付与)
+		<p>
+			リダイレクトを受けたOAuth Serverは、ユーザを認証し、
+			ユーザに対して当該OAuth Clientへアクセス権限付与を許可するかをたずねる。
+			<strong>この際のユーザ認証方法はOAuthの仕様には含まれない。</strong>
+			通常はID、パスワードの組み合わせを使用したり、Cookieなどを用いて認証を行う。
+		</p>
+	</li>
+	<li>Authorization Response(認可レスポンス)
+		<p>
+			ユーザがアクセス権限の付与を許可すると、OAuth Serverはユーザを
+			OAuth Clientにリダイレクトさせる。
+			この際、リダイレクトURLには<strong>アクセス権限付与を示すトークンが含まれる。</strong>
+			このトークンの表現形式もOAuth1.0とOAuth2.0で異なり、
+			OAuth2.0ではClientの特性(WebアプリなのかNativeアプリなのかなど)によって
+			<strong>「code」と「access_token」</strong>という2種類のトークン形式が存在する。
+			OAuth2.0では、アクセス権限の付与を示す情報を<strong>「Grant」</strong>と呼ぶ。
+		</p>
+	</li>
+	<li>Obtain Access Token(アクセストークンとの交換)
+		<p>
+			OAuth Clientは最後に<strong>受け取ったトークンをAccess Token
+			(以後APIにアクセスする際にアクセス権限付与を受けていることを
+			証明するために使用されるトークン)と交換する。</strong>
+			STEP4でaccess_tokenというパラメータを受け取っている場合は、
+			それがAccess Tokenに相当するため、本ステップは省略される。
+		</p>
+	</li>
+	<li>API Access(APIへのアクセス)
+		<p>
+			Access Tokenを受け取ると、期限切れになるか、無効化されるまで
+			基本的には何度でもAccess Tokenを使用してAPIにアクセスできる。
+		</p>
+	</li>
+</ol>
+
+
+<h1 id="sct02">(2)OAuth2.0の要点</h1>
+<div>
+	<a href="#sct01">Top</a>
+	<a href="#sct01">Before</a>
+	<a href="#sct03">Next</a>
+	<a href="#last">Last</a>
+</div>
+<p class="tl">■クライアントタイプ</p>
+<p>
+	OAuth2.0では、<strong>ConfidentialとPublic</strong>という
+	2種類のOAuthクライアントタイプを定義している。
+</p>
+<ul>
+	<li>Confidential Client
+		<p>
+			サーバ上で動くWebアプリなどのように、<strong>client_secretを秘密にできる</strong>
+			クライアント。Confidential Clientは登録時に<strong>client_idとclient_secret</strong>
+			という情報を受け取る。
+		</p>
+	</li>
+	<li>Public Client
+		<p>
+			JSアプリやネイティブアプリなどのように、<strong>client_secretを秘密にできない</strong>
+			クライアント。
+			OAuth1.0では全てのクライアントが秘密鍵の役割を果たすclient_secretを受け取っていたが、
+			逆コンパイルなどでclient_secretが漏えいする可能性も考慮した結果、
+			このような分類がされている。
+		</p>
+	</li>
+</ul>
+
+<hr>
+<p class="tl">■アクセス権限付与フロータイプ</p>
+<p>
+	OAuth2.0には、アクセス権限付与フローのタイプが4種類存在する。
+	うち3つはクライアントの特性に応じたタイプで、残る1つはOAuth1.0で
+	非常に特殊な存在であった「2-legged OAuth」と呼ばれていたものに該当するタイプ。
+</p>
+<ol>
+	<li>Authorization Code Grant(認可コードグラント)
+		<p>
+			主にConfidential Client向けに用意されたフローで、
+			Confidential Clientは基本的にこのフローを使用する。
+			仕様ではPublic Clientによるこのフローの利用を禁止していないが、
+			現状ではPublic Clientにこのフローを許可しているOAuth Serverは少ない。
+		</p>
+		<p>
+			Access Tokenが期限切れした場合などには、バックグラウンドで新たな
+			Access Tokenを取得するために用いられる<strong>「Refresh Token」</strong>
+			というトークンを発行することができる。
+		</p>
+	</li>
+	<li>Implicit Grant(インプリシットグラント)
+		<p>
+			Public Clientに用意されたフローで、client_secretなしで利用できるように
+			設計されている。
+			クライアント認証を行わないフローのため、Authorization Code Grantに比べると、
+			セキュリティ面は弱くなる。
+			このフローをサポートするOAuth Serverはクライアント登録時に
+			リダイレクトURLを強制的に登録させたり、同意画面でユーザに特別に注意を促したりするなど、
+			クライアントのなりすましに対して何らかの対策を行う必要がある。
+		</p>
+	</li>
+	<li>Resource Owner Password Credentials Grant(リソースオーナパスワードクレデンシャルグラント)
+		<p>OAuth Clientが直接ユーザのIDとパスワードを受け取り、OAuth Serverに渡すフロー。</p>
+	</li>
+	<li>Client Credentials Grant(クライアントクレデンシャルグラント)
+		<p>
+			ユーザの同意を必要としないリソース(アプリの利用状況など)に
+			アクセスする際に利用される。
+			<strong>client_idとclient_secretのみでAccess Tokenを取得</strong>できる。
+			client_secretが漏えいした際には第三者にこのフローを使用されてしまうリスクがあるため、
+			OAuth Serverがこのフローをサポートしているか否か、
+			サポートしている場合はこのフローで得られたAccess Tokenを利用して何ができるのかを
+			知っておくべき。
+		</p>
+	</li>
+</ol>
+<figure>
+	<figcaption>【Code Grant】</figcaption>
+	<img src="./static/codegrant.jpg" alt="Code Grant">
+</figure>
+<figure>
+	<figcaption>【Implicit Grant】</figcaption>
+	<img src="./static/implicitgrant.jpg" alt="Implicit Grant">
+</figure>
+<p>
+	<BR>
+</p>
+
+
+<h1 id="sct03">(3)OpenID</h1>
+<div>
+	<a href="#sct01">Top</a>
+	<a href="#sct02">Before</a>
+	<a href="#sct04">Next</a>
+	<a href="#last">Last</a>
+</div>
+<p class="tl">■OpenIDプロトコル</p>
+<p>
+	異なるサービス間でユーザの<strong>認証情報を受け渡す</strong>
+	ためのプロトコル。
+</p>
+
+<hr>
+<p class="tl">■OpenIDの登場人物</p>
+<figure>
+	<figcaption>【OpenIDの登場人物】</figcaption>
+	<img src="./static/openid.jpg" alt="OpenIDの登場人物">
+</figure>
+<ul>
+	<li>OpenID Provider(OP)
+		<p>ユーザ認証を行う</p>
+	</li>
+	<li>Relying Party(RP)
+		<p>ユーザの同意のもとにOPから認証結果を受け取る</p>
+	</li>
+	<li>End User
+		<p>ユーザ</p>
+	</li>
+</ul>
+<p>
+	OpenIDプロトコルにおけるユーザの画面遷移は
+	OAuthのResource Owner Password Credentials Grantと似ている。
+	<strong>ユーザはOP上でRPに認証情報と属性情報を渡すことについて同意する。</strong>
+	その後、ユーザはRPに戻され、RPはOPから受けとった認証情報を検証することで
+	ユーザが何者かを知ることができる。
+</p>
+
+<hr>
+<p class="tl">■OpenID Connect</p>
+<p>
+	OpenID ConnectはOpenIDの最新仕様として策定が進められている。
+	OpenIDにおける最低限の要件は
+	<strong>
+		「OpenID Provider(OP)とRelying Party(RP)間で認証結果と
+		属性情報(クレーム)の受け渡しができること」。
+	</strong>
+	OpenID ConnectはOAuth2.0をベースとすることで、さまざまなアプリケーションが
+	この要件を満たすことを目指している。
+</p>
+<p>
+	認証結果のやりとりには<strong>ID Token</strong>という文字列が使用される。
+	ID Tokenは下記値を含むデータをエンコードして電子署名を付加したもの。
+</p>
+<ul>
+	<li>発行元のOpenID Provider(OP)識別子</li>
+	<li>発行先のRelying Party(RP)識別子(client_id)</li>
+	<li>ユーザ識別子</li>
+	<li>発行日時</li>
+</ul>
+<p>
+	OAuth2.0でやりとりされるAccess TokenやAuthorization Codeとともに
+	認証結果を表すID Tokenを受け渡すことでID連携を可能にしている。
+	クレーム提供のためのUserInfoエンドポイントでは、ユーザの新規登録時に必要な
+	メールアドレス、氏名などの基本的なクレーム一覧が定義されている。
+	これらの機能は、
+	<strong>
+		OAuth2.0のリクエストパラメータに特定の値を指定するだけで利用できる。
+	</strong>
+</p>
+<figure>
+	<figcaption>【OpenID Connectのフロー】</figcaption>
+	<img src="./static/openidconnect.jpg" alt="OpenID Connectのフロー">
+</figure>
+<p>
+	仕様全体を通じてメッセージ形式にはJSONを採用しており、
+	JSONデータのエンコード、署名作成、暗号化については、OpenID Connectの仕様と
+	並行して標準化が進められている。
+</p>
+
+<hr>
+<p class="tl">■属性情報(クレーム)の扱い</p>
+<p>
+	OpenID Connectでは、クレームの扱いについて下記のような機能を定義している。
+</p>
+<ul>
+	<li>外部クレームの提供(Aggregated Claims、Distributed Clams)
+		<p>
+			RPが複数のOPが持つユーザのクレームを取得したいとき、
+			それぞれのOPに属性情報を要求するのは手間がかかる。
+			そのためOpenID Connectではこのような外部クレームをやりとりするために
+			<strong>「集約クレーム」と「分散クレーム」</strong>の2つを規定している。
+		</p>
+		<ul>
+			<li>集約クレーム
+				<p>
+					別のOPが持つクレームを電子署名付きで提供する。
+					RPからリクエストを受けたOPは、事前に取得していた、
+					もしくは動的に取得した別のOPのクレームをレスポンスに
+					含めることができる。
+				</p>
+			</li>
+			<li>分散クレーム
+				<p>
+					クレームそのものではなく、問い合わせ先のURLを扱う。
+					PublicなクレームであればエンドポイントURL、
+					ユーザ認可が必要な場合は
+					エンドポイントのURLとOAuth2.0のAccess Tokenを
+					レスポンスに含めることができる。
+				</p>
+			</li>
+		</ul>
+	</li>
+</ul>
+
+<hr>
+<p class="tl">■OpenID Connectのフロー例</p>
+<p>ここでは以下の状況でのOpenID Connectのフロー例を記載する。</p>
+<ul>
+	<li>RPはスマートフォン上で動作するネイティブアプリ</li>
+	<li>RPは新規アカウント登録/ログインにOpenID Connectを利用する</li>
+	<li>利用できるOPを固定せず、ユーザがいつも利用しているOPに対応する</li>
+</ul>
+<ol>
+	<li>Discovery & Dynamic Client Registration(OP探索と動的なRP登録)
+		<p>
+			ユーザからOP特定のためのヒントを受け取ることで、
+			任意のOPアカウントを利用できる。
+			RPがOPを特定し、OP識別子や各エンドポイントの情報を取得するまでの
+			一連の手続きを「Discovery」と呼ぶ。
+			OpenID Connectでは<strong>メールアドレス、OPのURL</strong>を
+			OP特定のためのヒントとして利用できる。
+		</p>
+		<p>
+			RPがそのOPを一度も利用したことが無い場合、何らかの方法でRP情報を
+			登録して、client_idなどを受け取る必要がある。
+			OpenID Connectでは
+			<strong>
+				RP登録用エンドポイントにPOSTリクエストを送信することで
+				動的なRP登録ができる。この登録処理を「Dynamic Client Registration」
+				と呼ぶ。
+			</strong>
+		</p>
+	</li>
+	<li>Authorization Request(認可リクエスト)
+		<p>
+			RPはOPに認可リクエストを送信する。
+			OAuth2.0の認可リクエストを下記のとおり拡張する。
+		</p>
+		<ul>
+			<li>scopeにopenidを含めることでOpenID Connectの認可リクエストであることを明示する</li>
+			<li>scopeにprofile emailなど、必要なクレームに対応した値をを含める</li>
+			<li>response_typeをid_tokenとし、認証イベントの状態を表すID Tokenを要求する</li>
+		</ul>
+		<p>
+			リクエストを受け取ったOPは、RPが求めているクレームへの
+			アクセス権限付与についての同意をユーザに求める。
+		</p>
+	</li>
+	<li>Authorization Response(認可応答)
+		<p>
+			ユーザが同意した場合、OPは認可応答をRPに返す。
+			Implict GrantではURLのフラグメント部にAccess Tokenなどが含まれる。
+			認可リクエストのresponse_typeパラメータにid_tokenを指定すると、
+			ID Tokenもフラグメント部に含まれる。
+		</p>
+	</li>
+	<li>ID Token Verification(ID Tokenの検証)
+		<p>
+			受け取ったID Tokenには、電子署名(Access Tokenのハッシュ値)が含まれる。
+			この電子署名を検証し、Access Tokenから生成したハッシュ値と比較することで、
+			ID TokenとAccess Tokenが正しく発行されたことを確認できる。
+			OAuth2.0では一度プロフィールAPIにアクセスしてユーザ識別子を取得し、
+			既存/新規アカウントの判定などを行うが、OpenID Connectでは
+			ID Tokenの中に識別子が含まれる値を利用できる。
+		</p>
+	</li>
+	<li>Accessing to UserInfo Endpoint(UserInfoエンドポイントへのアクセス)
+		<p>
+			RPは認可要求のscopeパラメータで指定したクレームを取得するために、
+			UserInfoエンドポイントにアクセスする。
+			UserInfoエンドポイントはOAuth2.0のProtected Resourceであり、
+			他のAPIと同様にリクエストにはアクセストークンを用いる。
+			レスポンスに含まれる標準的なクレームの名前などはすべて仕様で
+			定義されているため、RP開発者はOPごとの違いを意識する必要はない。
+		</p>
+	</li>
+</ol>
+<figure>
+	<figcaption>【OpenID Connectのフロー】</figcaption>
+	<img src="./static/squence.jpg" alt="OpenID Connectのフロー">
+</figure>
+
+
+<div id="last" class="mSeparator">
+	<a href="#sct01">Top</a>
+	<a href="#sct03">Before</a>
+	<a href="#last">Next</a>
+	<a href="#last">Last</a>
+</div>
+</body>
+</html>
