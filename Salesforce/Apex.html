@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>Apex</title>
+	<meta name=viewport content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Salesforce情報">
+	<style type="text/css">
+		strong{
+			color: #ff0000;
+			font-weight: bold;
+		}
+		table,th,td{
+			border:solid 1px;
+			border-collapse:collapse;
+			padding: 3px;
+		}
+		th{
+			white-space: nowrap;
+		}
+		.sSeparator{
+			margin-top: 10px;
+		}
+		.mSeparator{
+			margin-top: 20px;
+		}
+		.bSeparator{
+			margin-top: 50px;
+		}
+		.tCenter{
+			text-align: center;
+		}
+		.tRight{
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+<h1 id="sct01">■Apexの基本概念</h1>
+<div>
+<a href="#sct01">Top</a>
+<a href="#sct01">Before</a>
+<a href="#sct02">Next</a>
+<a href="#last">Last</a>
+</div>
+
+<h2>【パラメータについて】</h2>
+<p>
+	Integer、Stringなどのプリミティブ型、
+	およびsObjectなど非プリミティブ型も値で渡される。
+	そのため、非プリミティブ型のパラメータの参照先を
+	<strong>呼び出されるメソッド側で変更することはできない。</strong>
+	ただし、オブジェクトの内容は変更可能(Listの要素を追加、変更するなど)。
+</p>
+
+<h2>【比較演算子について】</h2>
+<ul>
+	<li>String型の場合
+		<p>
+			==演算子で比較した場合、
+			<strong>大文字小文字を区別しない。</strong>
+			equalsメソッド、containsメソッドでは区別される。
+		</p>
+		<p>
+			例)<br>
+			String a = 'ABC';<br>
+			String b = 'abc';
+		</p>
+		<table>
+		<tr>
+			<th>比較方法</th>
+			<th>結果</th>
+		</tr>
+		<tr>
+			<td>a == b</td>
+			<td class="tCenter">true</td>
+		</tr>
+		<tr>
+			<td>a.equals(b)</td>
+			<td class="tCenter">false</td>
+		</tr>
+		<tr>
+			<td>a.contains(b)</td>
+			<td class="tCenter">false</td>
+		</tr>
+		</table>
+	</li>
+	<li>Mapのキーの場合
+		<p>Mapのキーの場合、<strong>大文字小文字は区別される。</strong></p>
+		<p>
+			Map&lt;String, String&gt; wmap = new Map&lt;String, String&gt;();<br>
+			wmap.put('ABC', '1');<br>
+			wmap.put('abc', '2');<br>
+			wmap.keySet().size()　⇒　別キーとして登録されるので2になる
+		</p>
+	</li>
+	<li>sObject型の場合
+		<p>
+			==は<strong>参照先のオブジェクトが同じかどうか</strong>で比較される。
+			===は<strong>参照アドレスが同じかどうか</strong>で比較される。
+		</p>
+		<p>
+			例)同じAccountを参照するsObject型変数の比較<br>
+			Account a = [SELECT Id FROM Account WHERE Id = '123'];<br>
+			Account b = [SELECT Id FROM Account WHERE Id = '123'];<br>
+			Account c = a;<br>
+		</p>
+		<table>
+		<tr>
+			<th>比較方法</th>
+			<th>結果</th>
+		</tr>
+		<tr>
+			<td>a == b</td>
+			<td class="tCenter">true</td>
+		</tr>
+		<tr>
+			<td>a === b</td>
+			<td class="tCenter">false</td>
+		</tr>
+		<tr>
+			<td>a == c</td>
+			<td class="tCenter">true</td>
+		</tr>
+		<tr>
+			<td>a === c</td>
+			<td class="tCenter">true</td>
+		</tr>
+		</table>
+	</li>
+	<li class="mSeparator">ユーザ定義型の場合
+		<p>
+			==、===ともに<strong>参照先アドレスが同じかどうか</strong>
+			で比較される。
+		</p>
+		<p>
+			例)<br>
+			public class Cls{public Cls(){}}<br>
+			Cls a = new Cls();<br>
+			Cls b = new Cls();<br>
+			Cls c = a;<br>
+		</p>
+		<table>
+		<tr>
+			<th>比較方法</th>
+			<th>結果</th>
+		</tr>
+		<tr>
+			<td>a == b</td>
+			<td class="tCenter">false</td>
+		</tr>
+		<tr>
+			<td>a === b</td>
+			<td class="tCenter">false</td>
+		</tr>
+		<tr>
+			<td>a == c</td>
+			<td class="tCenter">true</td>
+		</tr>
+		<tr>
+			<td>a === c</td>
+			<td class="tCenter">true</td>
+		</tr>
+		</table>
+	</li>
+</ul>
+<p>
+	以下の演算子を使用した場合、
+	<strong>結果がnullになることはない</strong>(どちらかがnullの場合でも)。
+</p>
+<table>
+<tr>
+	<th>No</th>
+	<th>演算子</th>
+	<th>概要</th>
+</tr>
+<tr>
+	<td class="tCenter">1</td>
+	<td class="tCenter">==</td>
+	<td>等価演算子</td>
+</tr>
+<tr>
+	<td class="tCenter">2</td>
+	<td class="tCenter">===</td>
+	<td>厳密な等価演算子</td>
+</tr>
+<tr>
+	<td class="tCenter">3</td>
+	<td class="tCenter">&lt;</td>
+	<td>比較演算子(小なり)</td>
+</tr>
+<tr>
+	<td class="tCenter">4</td>
+	<td class="tCenter">=&lt;</td>
+	<td>比較演算子(以下)</td>
+</tr>
+<tr>
+	<td class="tCenter">5</td>
+	<td class="tCenter">&gt;</td>
+	<td>比較演算子(大なり)</td>
+</tr>
+<tr>
+	<td class="tCenter">6</td>
+	<td class="tCenter">&gt;=</td>
+	<td>比較演算子(以上)</td>
+</tr>
+<tr>
+	<td class="tCenter">7</td>
+	<td class="tCenter">!=</td>
+	<td>不等価演算子</td>
+</tr>
+<tr>
+	<td class="tCenter">8</td>
+	<td class="tCenter">!==</td>
+	<td>厳密な不等価演算子</td>
+</tr>
+</table>
+<p>
+	Integer、またはLong型の除算時に端数が発生する場合、
+	DoubleやDecimalに<strong>変換される前に除外</strong>されてしまう。
+</p>
+<p>
+	例)<br>
+	Integer a = 5;<br>
+	Integer b = 3;<br>
+	Double d = a / b;　⇒　dは1.0になる<br>
+	Double g = (Double)a / (Double)b;　⇒　dは1.6666666666666667になる
+</p>
+
+<h2>【変数の初期化について】</h2>
+<p>
+	明示的に初期化しない場合、プリミティブ型、非プリミティブ型ともに
+	<strong>nullで初期化</strong>される。
+	<strong>Boolean型もnull(falseではない)で初期化</strong>
+	されるので注意！
+</p>
+
+<div id="last" class="mSeparator">
+	<a href="#sct01">Top</a>
+	<a href="#sct01">Before</a>
+	<a href="#last">Next</a>
+	<a href="#last">last</a>
+</div>
+</body>
+</html>

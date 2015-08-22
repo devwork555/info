@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>Visualforce</title>
+	<meta name=viewport content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Salesforce情報">
+	<style type="text/css">
+		strong{
+			color: #ff0000;
+			font-weight: bold;
+		}
+		table,th,td{
+			border:solid 1px;
+			border-collapse:collapse;
+			padding: 3px;
+		}
+		th{
+			white-space: nowrap;
+		}
+		.sSeparator{
+			margin-top: 10px;
+		}
+		.mSeparator{
+			margin-top: 20px;
+		}
+		.bSeparator{
+			margin-top: 50px;
+		}
+		.tCenter{
+			text-align: center;
+		}
+		.tRight{
+			text-align: right;
+		}
+	</style>
+</head>
+<body>
+<h1 id="sct01">■Visualforceページ内実行順序</h1>
+<div>
+<a href="#sct01">Top</a>
+<a href="#sct01">Before</a>
+<a href="#sct02">Next</a>
+<a href="#last">Last</a>
+</div>
+<h2>【get要求】</h2>
+<p>
+	get要求は、ユーザがURLを入力したとき、またはユーザが新しいページに移動する
+	リンクやボタンがクリックされたときに発行される最初のページ要求。
+</p>
+<img src="./static/get.png" alt="get要求">
+<ol>
+	<li>
+		関連するカスタムコントローラ、または拡張コントローラのコンストラクタが実行され、
+		コントローラがインスタンス化される。
+	</li>
+	<li>
+		ページにカスタムコンポーネントが含まれている場合、そのコンポーネントが作成され、
+		関連するカスタムコントローラ、または拡張コントローラのコンストラクタが実行され、
+		コントローラがインスタンス化され、式({!})を使用した属性が評価される。
+	</li>
+	<li>
+		カスタムコンポーネントのassingToメソッドを実行後、actionメソッドを実行する。
+		最後にプロパティ値を設定し、すべてのメソッドが実行される。
+	</li>
+	<li>
+		apex:formコンポーネントが含まれている場合、暗号化されたビューステートが生成される。
+		ビューステートはページが更新されるたびに更新される。
+	</li>
+	<li>
+		生成されたHTMLがブラウザに送信され、JavaScriptなどのクライアント側処理が実行される。
+	</li>
+</ol>
+<p>
+	ユーザがページを操作すると、ページはaction、getter、setterメソッドを実行する。
+	ユーザによって新しいget要求が発行されると、ビューステートと
+	コントローラオブジェクトは削除される。
+</p>
+
+<h2>【postback要求】</h2>
+<p>postback要求は、ユーザの操作によってページ更新が必要になった場合に発行される。</p>
+<img src="./static/postback.png" alt="postback要求">
+<ol>
+	<li>
+		postback要求時にビューステートは復号化される。
+		<strong>
+			immediate属性がtrueに設定されたコンポーネントでは、
+			このフェーズが省略される(アクションは実行されるが、
+			入力に対する検証は実行されず、ページでのデータ変更は行われない)。
+		</strong>
+	</li>
+	<li>
+		式が評価され、コントローラと拡張コントローラのsetterメソッドが実行される。
+		すべてのsetterメソッドが正常に実行されない限り、データが更新されることはない。
+	</li>
+	<li>
+		postback要求をトリガしたアクションが実行される。アクションが正常に完了すると、
+		データが更新される。postback要求によってユーザが同じページに戻ると、
+		ビューステートが更新されている。
+	</li>
+	<li>
+		生成されたHTMLがブラウザに送信される。
+	</li>
+</ol>
+<p>
+	postback要求でリダイレクトが指定されており、そのリダイレクト先が
+	リダイレクト元と同じコントローラか、拡張コントローラのサブセットを使用するページである場合、
+	postback要求がそのページに対して実行される。
+	リダイレクト先がそのようなページでない場合、get要求が実行される。
+</p>
+<p>
+	pageReferenceのsetRedirectがtrueに設定されている場合、get要求が実行される。
+	pageReferenceのsetRedirectをfalseに設定しても、リダイレクト先が同じコントローラ、
+	もしくは拡張コントローラのサブセットを使用していないとget要求が実行される。
+	<strong>
+		ユーザが別のページにリダイレクトされると、ビューステートとコントローラオブジェクトは
+		削除される。
+	</strong>
+</p>
+
+<div id="last" class="mSeparator">
+	<a href="#sct01">Top</a>
+	<a href="#sct01">Before</a>
+	<a href="#last">Next</a>
+	<a href="#last">last</a>
+</div>
+</body>
+</html>
