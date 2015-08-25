@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<meta name=viewport content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Salesforce1">
+	<style type="text/css">
+		strong{
+			color: #ff0000;
+			font-weight: bold;
+		}
+		table,th,td{
+			border:solid 1px;
+			border-collapse:collapse;
+			padding: 3px;
+		}
+		th{
+			white-space: nowrap;
+		}
+		.sSeparator{
+			margin-top: 10px;
+		}
+		.mSeparator{
+			margin-top: 20px;
+		}
+		.bSeparator{
+			margin-top: 50px;
+		}
+		.tCenter{
+			text-align: center;
+		}
+		.tRight{
+			text-align: right;
+		}
+		.ntli:before{
+			content: "注";
+		}
+	</style>
+	<title>Salesforce1</title>
+</head>
+<body>
+<h1>■モバイルブラウザアプリケーション</h1>
+<p>モバイルブラウザでの<strong>Salesforceフルサイトの使用はサポートされていない。</strong></p>
+
+<h1>■通知について</h1>
+<ul>
+	<li>アプリケーション内通知
+		<p>
+			アプリケーション内通知はユーザがSalesforce1を使用しているときに
+			関連活動をユーザに通知する。ベルアイコンをタップすると、過去90日以内に
+			受信した最新の20件の通知を参照できる。
+			なお、アプリケーション内通知の有効化は、全員に対して有効化するか、無効化するかの2択。
+		</p>
+	</li>
+	<li>転送通知
+		<p>
+			転送通知は、Salesforce1ダウンロード可能アプリケーションが使用されていないときに、
+			モバイルデバイスに表示されるアラート。
+			システム管理者が組織に対して転送通知を有効にすると、各ユーザは自分のデバイスに
+			<strong>転送通知を受信するかどうかを選択できる。</strong>
+			システム管理者が組織に対して、「転送通知の完全なコンテンツ」を有効にした場合、
+			アプリケーション内通知と同じ完全なコンテンツが転送通知に含まれる。
+		</p>
+	</li>
+</ul>
+
+<h1>■ナビゲーションメニューについて</h1>
+<p>
+	スマート検索項目はメニューの[最近]セクションにSalesforceオブジェクトを表示する。
+	この項目をナビゲーションメニューに追加しない場合、ユーザはSlaesforceオブジェクトにアクセスできない。
+	ユーザに最近使ったオブジェクトの履歴がない場合、
+	[最近]セクションには一連のデフォルトオブジェクトが表示される。
+	なお、オブジェクト使用後、[最近]セクションに表示されるまでに最大15時間かかる可能性がある。
+</p>
+<ul>
+	<li>ユーザの種別ごとに異なるナビゲーションメニューを設定できない</li>
+	<li>
+		Visualforceページ、Lightningページ、またはLightningコンポーネントを
+		Salesforce1ナビゲーションメニューに含めるには、<strong>タブを作成する必要がある。</strong>
+	</li>
+	<li>
+		一部のオブジェクトは最近アクセスしていてもSalesforce1ナビゲーションメニューの
+		[最近]セクションには表示されない。
+	</li>
+	<li>
+		ダッシュボード、人、グループのメニュー項目をナビゲーションメニューに追加していない場合、
+		これらの項目はスマート検索項目内に自動的にに組み込まれ、[最近]セクションに
+		表示される。
+		ダッシュボード、人、グループをナビゲーションメニューに追加した場合、
+		[最近]セクション外に表示される。
+	</li>
+</ul>
+
+<h1>■コンパクトレイアウトについて</h1>
+<p>コンパクトレイアウトに割り当てた最初の4項目が以下の場所に表示される。</p>
+<ol>
+	<li>レコードの特徴領域</li>
+	<li>レコードの関連ページのモバイル(拡張ルックアップ)カード</li>
+</ol>
+<img src="./static/display1.png" alt="レコードの特徴">
+<img src="./static/display2.png" alt="モバイルカード">
+<p>コンパクトレイアウトには以下の項目を表示できない。</p>
+<ul>
+	<li>テキストエリア</li>
+	<li>ロングテキストエリア</li>
+	<li>リッチテキストエリア</li>
+	<li>複数選択リスト</li>
+</ul>
+<p>
+	ページレイアウトとコンパクトレイアウトは<strong>連動していない。</strong>
+	そのため、ページレイアウトから項目を削除しても、コンパクトレイアウトからは
+	削除されない。
+</p>
+
+
+
+</body>
+</html>
